@@ -1,0 +1,56 @@
+/* public/css/custom-style.css */
+
+/* body {
+    background-color: red !important;
+} */
+
+:root {
+    --primary-color: #007bff; /* Biru BPS yang lebih cerah */
+    --secondary-color: #6c757d;
+    --background-light: #f8f9fa;
+    --text-dark: #343a40;
+    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --border-radius: 0.5rem;
+}
+
+body {
+    background-color: var(--background-light);
+}
+
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.card-header {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.stat-card {
+    color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card h5 {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.stat-card .stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.bg-card-blue { background-color: #17a2b8; }
+.bg-card-green { background-color: #28a745; }
+.bg-card-yellow { background-color: #ffc107; color: var(--text-dark) !important; }
+
+.table-light thead th {
+    background-color: #e9ecef;
+    color: var(--text-dark);
+}

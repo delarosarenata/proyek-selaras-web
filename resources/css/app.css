@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+body{
+    background:  #1B3C53;
+  }
+
+/* Mengubah warna teks tab yang TIDAK aktif menjadi hitam/abu-abu gelap */
+.nav-tabs .nav-link {
+    color: #ffffff; /* Anda bisa ganti dengan 'black' atau kode warna lain */
+}
+
+/* Mengubah warna teks tab yang SEDANG AKTIF (misalnya, tetap biru atau dibuat tebal) */
+.nav-tabs .nav-link.active {
+    color: #0d6efd; /* Warna biru standar Bootstrap, bisa diganti */
+    font-weight: bold; /* Opsional: membuatnya tebal saat aktif */
+}
+
+/* (Opsional) Mengubah warna border saat aktif */
+.nav-tabs .nav-link.active {
+    border-color: #dee2e6 #dee2e6 #fff; /* Ini adalah warna border default, bisa disesuaikan */
+}
+
+/* Menerapkan font Poppins pada brand di navbar */
+.navbar-brand {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 2.5px; /* Memberi sedikit jarak antar huruf */
+}
+
+.star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+.star-rating input[type=radio] { display: none; }
+.star-rating label.star { font-size: 2.5rem; color: #ddd; cursor: pointer; }
+.star-rating input[type=radio]:checked ~ label.star,
+.star-rating label.star:hover, .star-rating label.star:hover ~ label.star { color: #ffc107; }
