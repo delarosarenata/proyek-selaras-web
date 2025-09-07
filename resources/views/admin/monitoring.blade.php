@@ -223,7 +223,7 @@
                             </td>
                             <td>
                                 @if($data->tanggal_pengisian_skd)
-                                    {{ $data->tanggal_pengisian_skd->format('d M Y, H:i') }}
+                                {{ \Carbon\Carbon::parse($data->tanggal_pengisian_skd)->format('d M Y') }}
                                 @else
                                     -
                                 @endif

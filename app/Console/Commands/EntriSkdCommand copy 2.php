@@ -13,33 +13,34 @@ class EntriSkdCommand extends Command
 
     public function handle()
     {
-        // 1. Ambil ID dari argumen
         $respondentId = $this->argument('respondentId');
-        $respondent = \App\Models\Respondent::find($respondentId);
+        $respondent = Respondent::find($respondentId);
 
         if (!$respondent) {
             $this->error("Responden dengan ID {$respondentId} tidak ditemukan.");
             return 1;
         }
 
-        $this->info("Memulai proses untuk responden ID: {$respondentId}");
+        $this->info("Memulai proses untuk responden ID: {$respondent->id}");
+        // $respondent->update(['status' => 'processing']);
 
-        $nodePath = 'C:\laragon\bin\nodejs\node-v18\node.exe'; // Sesuaikan versi jika perlu
+        // Ubah semua data menjadi satu string JSON untuk dikirim ke bot
+        $dataJson = $respondent->toJson();
+
+        $nodePath = 'C:\laragon\bin\nodejs\node-v18\node.exe'; // Sesuaikan versi
         $botScriptPath = 'C:\laragon\www\automation\skd-entri.js';
 
-        // [PERBAIKAN UTAMA] Kirim respondentId sebagai argumen ke bot
-        $process = new \Symfony\Component\Process\Process([$nodePath, $botScriptPath, $respondentId]);
+        // Kirim data JSON sebagai argumen
+        $process = new Process([$nodePath, $botScriptPath, $dataJson]);
         $process->setTimeout(3600);
         $process->run();
 
         if (!$process->isSuccessful()) {
             $respondent->update(['status' => 'gagal']);
-            $this->error('Proses entri GAGAL.');
-            $this->line($process->getErrorOutput());
+            $this->error('Proses entri GAGAL: ' . $process->getErrorOutput());
         } else {
-            // Biarkan bot yang mengupdate status sukses
-            $this->info('Proses entri SELESAI.');
-            $this->line($process->getOutput());
+            $respondent->update(['status' => 'sukses']);
+            $this->info('Proses entri SELESAI: ' . $process->getOutput());
         }
         return 0;
     }

@@ -139,64 +139,411 @@ class AdminController extends Controller
                          ->with('success', 'Data responden berhasil dihapus.');
     }
 
+    // public function showMonitoring()
+    // {
+    //     // $respondents = Respondent::all()->keyBy('email');
+    //     $bukuTamuAll = BukuTamu::latest('timestamp')->get();
+
+    //     // Saring data buku tamu
+    //     $bukuTamuFiltered = $bukuTamuAll->filter(function ($tamu) {
+    //         // Ambil isi kolom 'Layanan yang Anda butuhkan'
+    //         $layanan = $tamu->layanan_dibutuhkan ?? '';
+
+    //         // Pecah menjadi array untuk diperiksa
+    //         $layananArray = array_map('trim', explode(',', $layanan));
+
+    //         // KONDISI: Jika array hanya berisi 1 item dan item itu adalah 'Lainnya'
+    //         if (count($layananArray) === 1 && $layananArray[0] === 'Lainnya') {
+    //             return false; // JANGAN TAMPILKAN baris ini
+    //         }
+
+    //         return true; // Tampilkan semua baris lainnya
+    //     });
+
+    //     $skdByEmail = DataSkd::whereNotNull('email')
+    //     ->get(['email','tanggal_cacah','blok_4'])
+    //     ->groupBy('email');
+
+    //     $windowDays = null;
+
+    //     // $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($skdByEmail) {
+    //     //     $tanggalLayanan = Carbon::parse($tamu->timestamp);
+
+    //     //     if (!empty($tamu->email) && isset($respondents[$tamu->email])) {
+    //     //         $tamu->status_pengisian = 'Sudah Mengisi';
+    //     //         $tanggalIsiSkd = Carbon::parse($respondents[$tamu->email]->created_at);
+    //     //         $selisihHari = $tanggalLayanan->diffInDays($tanggalIsiSkd);
+    //     //         $tamu->keterangan = "Mengisi setelah {$selisihHari} hari menerima layanan";
+
+    //     //     } else {
+    //     //         $tamu->status_pengisian = 'Belum Mengisi';
+    //     //         $selisihHari = $tanggalLayanan->diffInDays(now());
+    //     //         $tamu->keterangan = "Belum mengisi setelah {$selisihHari} hari menerima layanan";
+    //     //     }
+    //     //     return $tamu;
+    //     // });
+
+    //     // // Proses pemetaan sekarang menggunakan data yang sudah difilter
+    //     // $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($respondents) {
+    //     //     if (!empty($tamu->email) && isset($respondents[$tamu->email])) {
+    //     //         $tamu->status_pengisian = 'Sudah Mengisi';
+    //     //         $tamu->tanggal_pengisian_skd = $respondents[$tamu->email]->created_at;
+    //     //     } else {
+    //     //         $tamu->status_pengisian = 'Belum Mengisi';
+    //     //         $tamu->tanggal_pengisian_skd = null;
+    //     //     }
+    //     //     return $tamu;
+    //     // });
+
+    //     $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($skdByEmail, $windowDays) {
+    //         $tLayanan = \Carbon\Carbon::parse($tamu->timestamp);
+    //         $status = 'Belum Mengisi';
+    //         $tglSkd = null;
+
+    //         if (!empty($tamu->email) && isset($skdByEmail[$tamu->email])) {
+    //             $match = collect($skdByEmail[$tamu->email])->first(function ($r) use ($tLayanan, $windowDays) {
+    //                 // pastikan “1” kebaca walau ada spasi/tipe beda
+    //                 $blok4 = trim((string) $r->blok_4);
+    //                 if ($blok4 !== '1') return false;
+
+    //                 if (empty($r->tanggal_cacah)) return false;
+    //                 $tCacah = \Carbon\Carbon::parse($r->tanggal_cacah);
+    //                 return $tLayanan->diffInDays($tCacah) <= $windowDays;
+    //             });
+
+    //             if ($match) {
+    //                 $status = 'Sudah Mengisi';
+    //                 $tglSkd = $match->tanggal_cacah;
+    //             }
+    //         }
+
+    //         $tamu->status_pengisian = $status;
+    //         $tamu->tanggal_pengisian_skd = $tglSkd;
+
+    //         // opsi: keterangan
+    //         if ($status === 'Sudah Mengisi' && $tglSkd) {
+    //             $selisih = $tLayanan->diffInDays(\Carbon\Carbon::parse($tglSkd));
+    //             $tamu->keterangan = "Mengisi setelah {$selisih} hari menerima layanan";
+    //         } else {
+    //             $selisih = $tLayanan->diffInDays(now());
+    //             $tamu->keterangan = "Belum mengisi setelah {$selisih} hari menerima layanan";
+    //         }
+
+    //         return $tamu;
+    //     });
+
+
+    //     $statistik = [
+    //         'total_tamu' => $monitoringData->count(),
+    //         'sudah_mengisi' => $monitoringData->where('status_pengisian', 'Sudah Mengisi')->count(),
+    //         'belum_mengisi' => $monitoringData->where('status_pengisian', 'Belum Mengisi')->count()
+    //     ];
+
+    //     return view('admin.monitoring', compact('monitoringData', 'statistik'));
+    // }
+
+    // public function showMonitoring()
+    // {
+    //     // Ambil semua Buku Tamu terbaru
+    //     $bukuTamuAll = BukuTamu::latest('timestamp')->get();
+
+    //     // Filter yang kebutuhannya bukan "Lainnya" saja
+    //     $bukuTamuFiltered = $bukuTamuAll->filter(function ($tamu) {
+    //         $arr = array_map('trim', explode(',', $tamu->layanan_dibutuhkan ?? ''));
+    //         return !(count($arr) === 1 && strtolower($arr[0]) === 'lainnya');
+    //     });
+
+    //     // Ambil SKD dan siapkan lookup by email yang sudah dinormalisasi
+    //     $skdByEmail = DataSkd::whereNotNull('email')
+    //         ->get(['id','email','tanggal_cacah','blok_4'])
+    //         ->map(function ($r) {
+    //             $r->email_norm = strtolower(trim(preg_replace('/\x{00A0}|\s+/u', '', (string)$r->email))); // buang spasi biasa & NBSP
+    //             $r->blok4_norm = preg_replace('/\D+/', '', (string) $r->blok_4) ?: null; // “1 ”, “1.0”, dsb → “1”
+    //             return $r;
+    //         })
+    //         ->groupBy('email_norm');
+        
+    //     // DIAGNOSTIC COUNTERS
+    //     $diag = [
+    //         'rows_bt'          => 0,
+    //         'no_email_bt'      => 0,
+    //         'no_skd_for_email' => 0,
+    //         'blok4_not_1'      => 0,
+    //         'skd_before_visit' => 0,
+    //         'matched'          => 0,
+    //     ];
+
+    //     // Kalau mau batasi jarak hari, isi angka. Kalau mau TANPA batas, set null.
+    //     $windowDays = null; // contoh: 7 kalau mau maksimal 7 hari setelah kunjungan
+
+    //     // 
+        
+    //     $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($skdByEmail, &$diag) {
+    //         $diag['rows_bt']++;
+
+    //         $emailNorm = strtolower(trim(preg_replace('/\x{00A0}|\s+/u', '', (string) ($tamu->email ?? ''))));
+    //         if ($emailNorm === '') {
+    //             $diag['no_email_bt']++;
+    //         }
+
+    //         // anchor tanggal
+    //         $tAnchor = !empty($tamu->tanggal_layanan)
+    //             ? \Carbon\Carbon::parse($tamu->tanggal_layanan)
+    //             : \Carbon\Carbon::parse($tamu->timestamp);
+
+    //         $status = 'Belum Mengisi';
+    //         $tglSkd = null;
+
+    //         if ($emailNorm !== '' && isset($skdByEmail[$emailNorm])) {
+    //             // kandidat: blok_4 == 1 & tanggal_cacah setelah/tepat anchor
+    //             $cands = collect($skdByEmail[$emailNorm])->filter(function ($r) use ($tAnchor, &$diag) {
+    //                 if ($r->blok4_norm !== '1') { $diag['blok4_not_1']++; return false; }
+    //                 if (empty($r->tanggal_cacah)) { return false; }
+    //                 $tC = \Carbon\Carbon::parse($r->tanggal_cacah);
+    //                 if ($tC->lt($tAnchor)) { $diag['skd_before_visit']++; return false; }
+    //                 return true;
+    //             });
+
+    //             $match = $cands
+    //                 ->sortBy(fn($r) => $tAnchor->diffInSeconds(\Carbon\Carbon::parse($r->tanggal_cacah)))
+    //                 ->first();
+
+    //             if ($match) {
+    //                 $status = 'Sudah Mengisi';
+    //                 $tglSkd = $match->tanggal_cacah;
+    //                 $diag['matched']++;
+    //             } else {
+    //                 // ada SKD buat email tsb tapi nggak ada yang qualify (semua before/ blok4≠1)
+    //             }
+    //         } else {
+    //             if ($emailNorm !== '') $diag['no_skd_for_email']++;
+    //         }
+
+    //         $tamu->status_pengisian = $status;
+    //         $tamu->tanggal_pengisian_skd = $tglSkd;
+
+    //         if ($status === 'Sudah Mengisi' && $tglSkd) {
+    //             $selisih = $tAnchor->diffInDays(\Carbon\Carbon::parse($tglSkd));
+    //             $tamu->keterangan = "Mengisi setelah {$selisih} hari menerima layanan";
+    //         } else {
+    //             $selisih = $tAnchor->diffInDays(now());
+    //             $tamu->keterangan = "Belum mengisi setelah {$selisih} hari menerima layanan";
+    //         }
+
+    //         return $tamu;
+    //     });
+
+    //     Log::info('MONITORING DIAG', $diag);
+
+
+    //     $statistik = [
+    //         'total_tamu'    => $monitoringData->count(),
+    //         'sudah_mengisi' => $monitoringData->where('status_pengisian', 'Sudah Mengisi')->count(),
+    //         'belum_mengisi' => $monitoringData->where('status_pengisian', 'Belum Mengisi')->count(),
+    //     ];
+
+    //     return view('admin.monitoring', compact('monitoringData', 'statistik'));
+    // }
+
+    // public function showMonitoring()
+    // {
+    //     $bukuTamuAll = BukuTamu::latest('timestamp')->get();
+
+    //     // skip baris yang hanya "Lainnya"
+    //     $bukuTamuFiltered = $bukuTamuAll->filter(function ($tamu) {
+    //         $arr = array_map('trim', explode(',', $tamu->layanan_dibutuhkan ?? ''));
+    //         return !(count($arr) === 1 && strtolower($arr[0]) === 'lainnya');
+    //     });
+
+    //     // siapkan SKD: normalize email & precompute "is checked" utk blok_4
+    //     // $skdByEmail = DataSkd::whereNotNull('email')
+    //     //     ->get(['id','email','tanggal_cacah','blok_4'])
+    //     //     ->map(function ($r) {
+    //     //         $r->email_norm = strtolower(trim(preg_replace('/\x{00A0}|\s+/u', '', (string)$r->email)));
+    //     //         // di sini kamu tambahin / ganti normalisasi blok_4
+    //     //         // (hapus versi yang pake regex centang kalau ada)
+    //     //         $r->blok4_norm = trim((string)$r->blok_4);   // <-- PASTIIN ADA INI
+    //     //         return $r;
+    //     //     })
+    //     //     ->groupBy('email_norm');
+
+    //     // ==== 2) bikin index SKD berbasis email yang sudah dinormalisasi (array biasa) ====
+    //     $skdIndex = [];
+    //     foreach (DataSkd::whereNotNull('email')->get(['id','email','tanggal_cacah','blok_4']) as $r) {
+    //         $key = $this->normEmail($r->email);
+    //         if ($key === '') continue;
+    //         // simpan minimal yang dibutuhkan
+    //         $skdIndex[$key][] = (object)[
+    //             'id'            => $r->id,
+    //             'tanggal_cacah' => $r->tanggal_cacah, // sudah cast date di model
+    //             'blok_4'        => (string) $r->blok_4,
+    //         ];
+    //     }
+
+
+    //     // kalau mau batasi jarak hari, isi angka; kalau tanpa batas biarkan null
+    //     $windowDays = null;
+
+    //     $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($skdIndex, $windowDays) {
+    //         $emailNorm = $this->normEmail($tamu->email ?? '');
+
+    //         $tAnchor = !empty($tamu->tanggal_layanan)
+    //             ? \Carbon\Carbon::parse($tamu->tanggal_layanan)->startOfDay()
+    //             : \Carbon\Carbon::parse($tamu->timestamp)->startOfDay();
+
+    //         $status = 'Belum Mengisi';
+    //         $tglSkd = null;
+
+    //         if ($emailNorm !== '' && isset($skdIndex[$emailNorm])) {
+    //             // kandidat: BLOK 4 harus '1', tanggal ada, dan >= anchor
+    //             $candidates = collect($skdIndex[$emailNorm])->filter(function ($r) use ($tAnchor) {
+    //                 if (trim($r->blok_4) !== '1') return false;
+    //                 if (empty($r->tanggal_cacah)) return false;
+    //                 $tC = \Carbon\Carbon::parse($r->tanggal_cacah)->startOfDay();
+    //                 return $tC->gte($tAnchor);
+    //             });
+
+    //             if (is_numeric($windowDays)) {
+    //                 $limit = $tAnchor->copy()->addDays($windowDays);
+    //                 $candidates = $candidates->filter(fn($r) => \Carbon\Carbon::parse($r->tanggal_cacah)->startOfDay()->lte($limit));
+    //             }
+
+    //             $match = $candidates
+    //                 ->sortBy(fn($r) => $tAnchor->diffInSeconds(\Carbon\Carbon::parse($r->tanggal_cacah)))
+    //                 ->first();
+
+    //             if ($match) {
+    //                 $status = 'Sudah Mengisi';
+    //                 $tglSkd = $match->tanggal_cacah;
+    //             }
+    //         }
+
+    //         $tamu->status_pengisian = $status;
+    //         $tamu->tanggal_pengisian_skd = $tglSkd;
+
+    //         if ($status === 'Sudah Mengisi' && $tglSkd) {
+    //             $selisih = $tAnchor->diffInDays(\Carbon\Carbon::parse($tglSkd));
+    //             $tamu->keterangan = "Mengisi setelah {$selisih} hari menerima layanan";
+    //         } else {
+    //             $selisih = $tAnchor->diffInDays(now());
+    //             $tamu->keterangan = "Belum mengisi setelah {$selisih} hari menerima layanan";
+    //         }
+
+    //         return $tamu;
+    //     });
+
+
+    //     // (opsional) log ringkas buat cek cepat
+    //     Log::info('MONITOR QUICK', [
+    //         'bt_rows'   => $bukuTamuFiltered->count(),
+    //         'skd_keys'  => count($skdIndex),
+    //         'matched'   => $monitoringData->where('status_pengisian','Sudah Mengisi')->count(),
+    //         'has_sumarwah' => isset($skdIndex[$this->normEmail('vivizakira@gmail.com')]),
+    //     ]);
+
+
+    //     $statistik = [
+    //         'total_tamu'    => $monitoringData->count(),
+    //         'sudah_mengisi' => $monitoringData->where('status_pengisian', 'Sudah Mengisi')->count(),
+    //         'belum_mengisi' => $monitoringData->where('status_pengisian', 'Belum Mengisi')->count(),
+    //     ];
+
+    //     return view('admin.monitoring', compact('monitoringData', 'statistik'));
+    // }
+
+    // private function normEmail($s)
+    // {
+    //     // hapus spasi (termasuk NBSP), lowercase, trim
+    //     $s = (string) $s;
+    //     $s = preg_replace('/\x{00A0}|\s+/u', '', $s);
+    //     return strtolower(trim($s));
+    // }
+
     public function showMonitoring()
     {
-        $respondents = Respondent::all()->keyBy('email');
-        $bukuTamuAll = BukuTamu::latest('timestamp')->get();
+        // =======================
+        // ATURAN SEDERHANA
+        // =======================
+        $AFTER_ONLY  = true;  // true = hanya SKD setelah/tepat hari kunjungan
+        $WINDOW_DAYS = null;  // isi angka (mis. 7) kalau mau batas jarak hari; biarkan null kalau tanpa batas
 
-        // Saring data buku tamu
-        $bukuTamuFiltered = $bukuTamuAll->filter(function ($tamu) {
-            // Ambil isi kolom 'Layanan yang Anda butuhkan'
-            $layanan = $tamu->layanan_dibutuhkan ?? '';
-
-            // Pecah menjadi array untuk diperiksa
-            $layananArray = array_map('trim', explode(',', $layanan));
-
-            // KONDISI: Jika array hanya berisi 1 item dan item itu adalah 'Lainnya'
-            if (count($layananArray) === 1 && $layananArray[0] === 'Lainnya') {
-                return false; // JANGAN TAMPILKAN baris ini
-            }
-
-            return true; // Tampilkan semua baris lainnya
+        // 1) Ambil Buku Tamu & skip "Lainnya"
+        $bukuTamu = BukuTamu::latest('timestamp')->get()->filter(function ($t) {
+            $arr = array_map('trim', explode(',', $t->layanan_dibutuhkan ?? ''));
+            return !(count($arr) === 1 && strtolower($arr[0]) === 'lainnya');
         });
 
-        $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($respondents) {
-            $tanggalLayanan = Carbon::parse($tamu->timestamp);
+        // 2) Bikin index SKD: email -> daftar tanggal_cacah (hanya BLOK 4 = '1')
+        $skdIndex = [];
+        $skdRows = DataSkd::whereNotNull('email')->get(['email','tanggal_cacah','blok_4']);
+        foreach ($skdRows as $r) {
+            $email = $this->normEmail($r->email);
+            if ($email === '') continue;
+            if (trim((string)$r->blok_4) !== '1') continue;     // hanya yang benar2 "sudah isi"
+            if (empty($r->tanggal_cacah)) continue;
 
-            if (!empty($tamu->email) && isset($respondents[$tamu->email])) {
-                $tamu->status_pengisian = 'Sudah Mengisi';
-                $tanggalIsiSkd = Carbon::parse($respondents[$tamu->email]->created_at);
-                $selisihHari = $tanggalLayanan->diffInDays($tanggalIsiSkd);
-                $tamu->keterangan = "Mengisi setelah {$selisihHari} hari menerima layanan";
+            // simpan sebagai Carbon date (startOfDay biar fair)
+            $skdIndex[$email][] = \Carbon\Carbon::parse($r->tanggal_cacah)->startOfDay();
+        }
 
-            } else {
-                $tamu->status_pengisian = 'Belum Mengisi';
-                $selisihHari = $tanggalLayanan->diffInDays(now());
-                $tamu->keterangan = "Belum mengisi setelah {$selisihHari} hari menerima layanan";
+        // 3) Tentukan status per tamu
+        $monitoringData = $bukuTamu->map(function ($t) use ($skdIndex, $AFTER_ONLY, $WINDOW_DAYS) {
+            $email = $this->normEmail($t->email ?? '');
+            $anchor = !empty($t->tanggal_layanan)
+                ? \Carbon\Carbon::parse($t->tanggal_layanan)->startOfDay()
+                : \Carbon\Carbon::parse($t->timestamp)->startOfDay();
+
+            $status = 'Belum Mengisi';
+            $tglSkd = null;
+
+            if ($email !== '' && isset($skdIndex[$email])) {
+                // filter kandidat sesuai aturan
+                $cands = collect($skdIndex[$email])->filter(function ($d) use ($anchor, $AFTER_ONLY, $WINDOW_DAYS) {
+                    if ($AFTER_ONLY && $d->lt($anchor)) return false;              // harus setelah/tepat hari H
+                    if (is_numeric($WINDOW_DAYS)) {
+                        return $d->lte($anchor->copy()->addDays($WINDOW_DAYS));    // dalam jendela hari
+                    }
+                    return true; // tanpa batas jarak
+                })
+                // ambil yang PALING DEKAT setelah anchor
+                ->sortBy(fn($d) => $anchor->diffInSeconds($d));
+
+                $match = $cands->first();
+                if ($match) {
+                    $status = 'Sudah Mengisi';
+                    $tglSkd = $match->toDateString();
+                }
             }
-            return $tamu;
-        });
 
-        // Proses pemetaan sekarang menggunakan data yang sudah difilter
-        $monitoringData = $bukuTamuFiltered->map(function ($tamu) use ($respondents) {
-            if (!empty($tamu->email) && isset($respondents[$tamu->email])) {
-                $tamu->status_pengisian = 'Sudah Mengisi';
-                $tamu->tanggal_pengisian_skd = $respondents[$tamu->email]->created_at;
-            } else {
-                $tamu->status_pengisian = 'Belum Mengisi';
-                $tamu->tanggal_pengisian_skd = null;
-            }
-            return $tamu;
+            // tulis kembali ke objek untuk view
+            $t->status_pengisian = $status;
+            $t->tanggal_pengisian_skd = $tglSkd;
+            $t->keterangan = $status === 'Sudah Mengisi'
+                ? "Mengisi setelah ".$anchor->diffInDays(\Carbon\Carbon::parse($tglSkd))." hari menerima layanan"
+                : "Belum mengisi setelah ".$anchor->diffInDays(now())." hari menerima layanan";
+
+            return $t;
         });
 
         $statistik = [
-            'total_tamu' => $monitoringData->count(),
+            'total_tamu'    => $monitoringData->count(),
             'sudah_mengisi' => $monitoringData->where('status_pengisian', 'Sudah Mengisi')->count(),
-            'belum_mengisi' => $monitoringData->where('status_pengisian', 'Belum Mengisi')->count()
+            'belum_mengisi' => $monitoringData->where('status_pengisian', 'Belum Mengisi')->count(),
         ];
 
         return view('admin.monitoring', compact('monitoringData', 'statistik'));
     }
+
+    // normalisasi email (tetap dipakai)
+    private function normEmail($s)
+    {
+        $s = (string)$s;
+        $s = preg_replace('/\x{00A0}|\s+/u', '', $s); // buang spasi & NBSP
+        return strtolower(trim($s));
+    }
+
+
+
 
     public function syncFromGoogleSheets()
     {
@@ -279,23 +626,28 @@ class AdminController extends Controller
             if (!empty($dataSkdValues)) {
                 $dataSkdHeader = array_map('trim', array_shift($dataSkdValues));
                 DataSkd::truncate();
-                $currentYear = now()->year;
-                $tanggalCacahIndex = array_search('Tanggal Cacah', $dataSkdHeader);
-                
-                $filteredSkdValues = collect($dataSkdValues)->filter(function ($row) use ($tanggalCacahIndex, $currentYear) {
-                    if ($tanggalCacahIndex === false || !isset($row[$tanggalCacahIndex]) || empty($row[$tanggalCacahIndex])) return false;
-                    try {
-                        return Carbon::parse($row[$tanggalCacahIndex])->year == $currentYear;
-                    } catch (\Exception $e) { return false; }
-                });
 
-                foreach ($filteredSkdValues as $row) {
+                // $currentYear = now()->year;
+                // $tanggalCacahIndex = array_search('Tanggal Cacah', $dataSkdHeader);
+                
+                // $filteredSkdValues = collect($dataSkdValues)->filter(function ($row) use ($tanggalCacahIndex, $currentYear) {
+                //     if ($tanggalCacahIndex === false || !isset($row[$tanggalCacahIndex]) || empty($row[$tanggalCacahIndex])) return false;
+                //     try {
+                //         return Carbon::parse($row[$tanggalCacahIndex])->year == $currentYear;
+                //     } catch (\Exception $e) { return false; }
+                // });
+
+                foreach ($dataSkdValues as $row) {
+
+                    if (!collect($row)->contains(fn ($v) => trim((string)$v) !== '')) {
+                        continue;
+                    }
+
                     $rowData = [];
                     foreach ($dataSkdHeader as $index => $header) {
                         $rowData[$header] = $row[$index] ?? null;
                     }
                     
-                    // PASTIKAN BLOK CREATE ANDA LENGKAP SEPERTI INI
                     DataSkd::create([
                         'kategori'      => $rowData['Kategori'] ?? null,
                         'nama'          => $rowData['Nama'] ?? null,
@@ -306,7 +658,8 @@ class AdminController extends Controller
                         'blok_2'        => $rowData['BLOK 2'] ?? null,
                         'blok_3'        => $rowData['BLOK 3'] ?? null,
                         'blok_4'        => $rowData['BLOK 4'] ?? null,
-                        'tanggal_cacah' => !empty($rowData['Tanggal Cacah']) ? Carbon::parse($rowData['Tanggal Cacah'])->toDateString() : null,
+                        // 'tanggal_cacah' => !empty($rowData['Tanggal Cacah']) ? Carbon::parse($rowData['Tanggal Cacah'])->toDateString() : null,
+                        'tanggal_cacah' => $this->parseAnyDate($rowData['Tanggal Cacah'] ?? null),
                     ]);
                     $dataSkdCreatedCount++;
                 }
@@ -320,6 +673,36 @@ class AdminController extends Controller
             return redirect()->route('admin.monitoring')->with('error', 'Terjadi kesalahan. Cek log untuk detail: ' . substr($e->getMessage(), 0, 200) . '...');
         }
     }
+
+    private function clean($v)
+    {
+        if (is_string($v)) $v = trim($v);
+        return ($v === '' ? null : $v);
+    }
+
+    private function parseAnyDate($value)
+    {
+        if (empty($value)) return null;
+        $value = trim($value);
+
+        $formats = [
+            'd/m/Y H:i:s', 'd/m/Y', 'd-m-Y', 'Y-m-d', 'm/d/Y', 'Y/m/d', 'd M Y',
+        ];
+
+        foreach ($formats as $fmt) {
+            try {
+                return \Carbon\Carbon::createFromFormat($fmt, $value)->toDateString();
+            } catch (\Throwable $e) {}
+        }
+
+        // fallback Carbon::parse (buat format bebas / serial date yang bisa dikenali)
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable $e) {
+            return null; // kalau tetap gagal, biarkan null tapi barisnya tetap masuk
+        }
+    }
+
 
     public function indexResponden()
     {

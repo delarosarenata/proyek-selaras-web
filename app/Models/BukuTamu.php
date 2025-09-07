@@ -13,4 +13,10 @@ class BukuTamu extends Model
      * Izinkan semua kolom untuk diisi secara massal.
      */
     protected $guarded = [];
+
+    protected $casts = [
+        'tanggal_layanan' => 'date',
+        'timestamp'       => 'datetime',
+    ];
+
 }

@@ -396,15 +396,41 @@
         
         const penilaianPetugasHtml = `<h6 class="mb-3 fw-bold text-primary">Penilaian Terhadap Petugas</h6><table class="table table-sm table-bordered"><tbody><tr><th style="width: 30%;">Petugas</th><td>${petugasDinilaiText}</td></tr><tr><th>Rating</th><td>${ratingBintangHtml}</td></tr><tr><th>Kritik & Saran</th><td>${data.kritik_saran || '<em class="text-muted">Tidak ada.</em>'}</td></tr></tbody></table>`;
         const blok1Html = `<h6 class="mb-3 fw-bold text-primary">Informasi Responden</h6><table class="table table-sm table-bordered"><tbody><tr><th style="width: 30%;">Nama</th><td>${data.nama||'-'}</td></tr><tr><th>Email</th><td>${data.email||'-'}</td></tr><tr><th>No. HP</th><td>${data.no_hp||'-'}</td></tr><tr><th>Jenis Kelamin</th><td>${data.jenis_kelamin||'-'}</td></tr><tr><th>Pendidikan</th><td>${pendidikanMap[data.pendidikan_id]||'-'}</td></tr><tr><th>Pekerjaan</th><td>${data.pekerjaan_lainnya||pekerjaanMap[data.pekerjaan_id]||'-'}</td></tr><tr><th>Instansi</th><td>${data.instansi_lainnya||instansiMap[data.instansi_id]||'-'}</td></tr><tr><th>Nama Instansi</th><td>${data.nama_instansi||'-'}</td></tr><tr><th>Pemanfaatan</th><td>${data.pemanfaatan_lainnya||pemanfaatanMap[data.pemanfaatan_id]||'-'}</td></tr><tr><th>Jenis Layanan</th><td>${(data.jenis_layanan||[]).join(', ')||'-'}</td></tr><tr><th>Sarana</th><td>${(data.sarana_digunakan||[]).join(', ')||'-'}</td></tr><tr><th>Pengaduan?</th><td>${data.pernah_pengaduan||'-'}</td></tr></tbody></table>`;
-        let blok2Html = `<h6 class="mb-3 fw-bold text-primary">Penilaian Pelayanan</h6><table class="table table-sm table-bordered table-striped"><thead class="table-light"><tr><th>Aspek</th><th class="text-center">Penting</th><th class="text-center">Puas</th></tr></thead><tbody>`;
-        if (data.penilaian && Object.keys(data.penilaian).length > 0) {
-            for (const [q, v] of Object.entries(data.penilaian)) {
-                blok2Html += `<tr><td>${penilaianMap[q]||q}</td><td class="text-center">${v.kepentingan||'-'}</td><td class="text-center">${v.kepuasan||'-'}</td></tr>`;
-            }
-        } else {
-            blok2Html += `<tr><td colspan="3" class="text-center text-muted">Tidak ada data.</td></tr>`;
+
+        // let blok2Html = `<h6 class="mb-3 fw-bold text-primary">Penilaian Pelayanan</h6><table class="table table-sm table-bordered table-striped"><thead class="table-light"><tr><th>Aspek</th><th class="text-center">Penting</th><th class="text-center">Puas</th></tr></thead><tbody>`;
+        // if (data.penilaian && Object.keys(data.penilaian).length > 0) {
+        //     for (const [q, v] of Object.entries(data.penilaian)) {
+        //         blok2Html += `<tr><td>${penilaianMap[q]||q}</td><td class="text-center">${v.kepentingan||'-'}</td><td class="text-center">${v.kepuasan||'-'}</td></tr>`;
+        //     }
+        // } else {
+        //     blok2Html += `<tr><td colspan="3" class="text-center text-muted">Tidak ada data.</td></tr>`;
+        // }
+        // blok2Html += `</tbody></table>`;
+            let blok2Html = `<h6 class="mb-3 fw-bold text-primary">Penilaian Terhadap Pelayanan</h6>`;
+    
+    // Cek apakah ada data fasilitas utama
+    const fasilitasUtama = data.penilaian?.q8?.fasilitas_utama;
+
+    if (fasilitasUtama) {
+        blok2Html += `
+            <div class="alert alert-light border mb-4">
+                <strong class="d-block mb-1">Fasilitas Utama yang Dinilai:</strong>
+                <span class="badge bg-primary fs-6">${fasilitasUtama}</span>
+            </div>
+        `;
+    }
+
+    blok2Html += `<table class="table table-sm table-bordered table-striped"><thead class="table-light"><tr><th>Aspek Pelayanan</th><th class="text-center">Tingkat Kepentingan</th><th class="text-center">Tingkat Kepuasan</th></tr></thead><tbody>`;
+    if (data.penilaian && Object.keys(data.penilaian).length > 0) {
+        for (const [q, v] of Object.entries(data.penilaian)) {
+            const questionText = penilaianMap[q] || `Pertanyaan ${q.substring(1)}`;
+            blok2Html += `<tr><td>${questionText}</td><td class="text-center">${v.kepentingan||'-'}</td><td class="text-center">${v.kepuasan||'-'}</td></tr>`;
         }
-        blok2Html += `</tbody></table>`;
+    } else {
+        blok2Html += `<tr><td colspan="3" class="text-center text-muted">Tidak ada data penilaian.</td></tr>`;
+    }
+    blok2Html += `</tbody></table>`;
+
         const blok4Html = `<h6 class="mb-3 fw-bold text-primary">Catatan</h6><div class="p-3 bg-light rounded border"><p class="mb-0 fst-italic">${data.catatan||'Tidak ada.'}</p></div>`;
 
         detailContent.innerHTML = `<ul class="nav nav-tabs nav-fill mb-3" id="detailTab" role="tablist"><li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#penilaian-content">PENILAIAN</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#blok1-content">BLOK I</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#blok2-content">BLOK II</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#blok3-content">BLOK III</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#blok4-content">BLOK IV</button></li></ul><div class="tab-content"><div class="tab-pane fade show active" id="penilaian-content">${penilaianPetugasHtml}</div><div class="tab-pane fade" id="blok1-content">${blok1Html}</div><div class="tab-pane fade" id="blok2-content">${blok2Html}</div><div class="tab-pane fade" id="blok3-content">${formatKebutuhanData(data.kebutuhan_data)}</div><div class="tab-pane fade" id="blok4-content">${blok4Html}</div></div>`;

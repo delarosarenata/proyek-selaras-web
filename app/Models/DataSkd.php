@@ -13,4 +13,10 @@ class DataSkd extends Model
      * Izinkan semua kolom untuk diisi secara massal.
      */
     protected $guarded = [];
+
+    protected $casts = [
+        'tanggal_cacah' => 'date',
+        'blok_4'        => 'string', // dibandingin sebagai string '1'
+    ];
+
 }
