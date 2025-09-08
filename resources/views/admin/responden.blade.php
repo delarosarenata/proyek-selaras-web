@@ -344,6 +344,19 @@
     </div>
 </div>
 
+<!-- Toast sukses salin -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:1080">
+  <div id="copyToast" class="toast align-items-center text-bg-dark border-0"
+       role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="1500">
+    <div class="d-flex">
+      <div class="toast-body">Link edit berhasil disalin!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+
 
     @endsection
 
@@ -405,11 +418,22 @@
             });
     }
 
+    // function copyLink(link) {
+    //     navigator.clipboard.writeText(link).then(() => {
+    //         alert('Link edit berhasil disalin!');
+    //     });
+    // }
+
     function copyLink(link) {
-        navigator.clipboard.writeText(link).then(() => {
-            alert('Link edit berhasil disalin!');
-        });
+    navigator.clipboard.writeText(link).then(() => {
+        const el = document.getElementById('copyToast');
+        if (el) {
+        const toast = new bootstrap.Toast(el);
+        toast.show();
+        }
+    });
     }
+
 
     function populateModal(data) {
         let petugasDinilaiText = '<span class="text-muted">Tidak Diketahui</span>';
