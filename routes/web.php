@@ -57,9 +57,14 @@ Route::middleware(['auth', 'can:view-admin-pages'])
     Route::post('/run-bot/{respondent}', [AdminController::class, 'triggerSkdBot'])->name('run_bot');
     Route::post('/run-all-bots', [AdminController::class, 'triggerAllBots'])->name('run_all_bots');
 
+    
+
     // Rute untuk Manajemen Pengguna (dijaga oleh gate 'manage-users')
     Route::resource('users', UserController::class)->middleware('can:view-user-management');
 });
+
+Route::get('/admin/respondents/{respondent}/status', [AdminController::class, 'status'])
+    ->name('admin.respondent.status');
 
 Route::get('/tes-gsheet', function() {
     try {

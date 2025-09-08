@@ -222,7 +222,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    @php
+                                    <!-- @php
                                         $status = $respondent->status;
                                         $badgeClass = '';
                                         switch ($status) {
@@ -238,6 +238,25 @@
                                         }
                                     @endphp
                                     <span class="badge {{ $badgeClass }} text-capitalize">{{ $status }}</span>
+                                     <span id="status-{{ $respondent->id }}">{{ $respondent->status }}</span> -->
+
+                                     @php
+                                        $status = $respondent->status;
+                                        $badgeClass = match($status) {
+                                            'sukses'  => 'badge bg-success',
+                                            'gagal'   => 'badge bg-danger',
+                                            'pending' => 'badge bg-secondary',
+                                            default   => 'badge bg-light text-dark',
+                                        };
+                                    @endphp
+
+                                    <span id="status-{{ $respondent->id }}"
+                                        class="{{ $badgeClass }} text-capitalize"
+                                        data-status="{{ $status }}">
+                                    {{ $status }}
+                                    </span>
+
+
                                 </td>
 
                                 <td>
@@ -260,10 +279,20 @@
                                                 @csrf
                                                 <button type="submit" class="btn btn-success btn-sm" title="Jalankan Bot Entri">🤖</button>
                                             </form> -->
-                                            <form action="{{ route('admin.run_bot', $respondent) }}" method="POST" class="d-inline form-confirm" data-swal-title="Jalankan Bot?" data-swal-text="Proses ini akan menjalankan entri otomatis untuk responden ini.">
+                                            <!-- <form action="{{ route('admin.run_bot', $respondent) }}" method="POST" class="d-inline form-confirm" data-swal-title="Jalankan Bot?" data-swal-text="Proses ini akan menjalankan entri otomatis untuk responden ini.">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm" title="Jalankan Bot Entri">🤖</button>
+                                            </form> -->
+                                            <form class="run-bot-form d-inline form-confirm"
+                                                action="{{ route('admin.run_bot', $respondent) }}"
+                                                method="POST"
+                                                onsubmit="return false;"
+                                                data-id="{{ $respondent->id }}"
+                                                data-status-url="{{ route('admin.respondent.status', $respondent) }}">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success btn-sm" title="Jalankan Bot Entri">🤖</button>
                                             </form>
+
                                         @endif
 
                                     @endcan
@@ -456,4 +485,88 @@
         return html;
     }
 </script>
+
+<!-- <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const forms = document.querySelectorAll('.run-bot-form');
+
+  forms.forEach(form => {
+    form.addEventListener('submit', async function () {
+      const id = form.dataset.id;
+      const statusUrl = form.dataset.statusUrl;
+      const btn = form.querySelector('button[type="submit"]');
+      const statusSpan = document.getElementById('status-' + id);
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+
+      // UI: memproses…
+      const oldBtnHtml = btn.innerHTML;
+      const oldStatusText = statusSpan ? statusSpan.textContent : '';
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Memproses…';
+      if (statusSpan) statusSpan.textContent = 'memproses…';
+
+      // Kirim POST tombol via fetch (tanpa reload)
+      try {
+        const body = new FormData(form);
+        await fetch(form.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf },
+          body
+        });
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = oldBtnHtml;
+        if (statusSpan) statusSpan.textContent = oldStatusText;
+        alert('Gagal mengirim perintah bot: ' + (err?.message || err));
+        return;
+      }
+
+      // Polling status sampai 'sukses' / 'gagal'
+      let tries = 0, maxTries = 180; // ±6 menit (180 x 2s)
+      const timer = setInterval(async () => {
+        tries++;
+        try {
+          const r = await fetch(statusUrl, { headers: { 'Accept': 'application/json' }});
+          if (r.ok) {
+            const j = await r.json();
+            if (j.status === 'sukses' || j.status === 'gagal') {
+              if (statusSpan) statusSpan.textContent = j.status;
+              btn.disabled = false;
+              btn.innerHTML = oldBtnHtml;
+              clearInterval(timer);
+            }
+          }
+        } catch (e) {
+          // abaikan sementara
+        }
+
+        if (tries >= maxTries) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.innerHTML = oldBtnHtml;
+          if (statusSpan) statusSpan.textContent = oldStatusText;
+          alert('Timeout menunggu hasil bot. Cek watcher, lalu coba klik ulang.');
+        }
+      }, 2000);
+    });
+  });
+});
+</script> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.run-bot-form').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      // Nonaktifkan SEMUA tombol jalankan bot sampai halaman reload
+      document.querySelectorAll('.run-bot-form button[type="submit"]').forEach(function (btn) {
+        if (!btn.dataset.original) btn.dataset.original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Mengirim...';
+      });
+    });
+  });
+});
+</script>
+
+
 @endpush

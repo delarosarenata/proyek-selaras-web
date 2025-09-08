@@ -6,6 +6,8 @@ use App\Jobs\RunSkdBot;
 use Illuminate\Http\Request;
 use App\Models\Respondent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
 
 use App\Models\BukuTamu;
 use App\Models\DataSkd;
@@ -711,16 +713,36 @@ class AdminController extends Controller
     }
 
     // Method untuk tombol per baris
+    // public function triggerSkdBot(Respondent $respondent)
+    // {
+    //     if ($respondent->status === 'sukses') {
+    //         return back()->with('error', 'Data ini sudah berstatus SUKSES dan tidak bisa dientri ulang.');
+    //     }
+
+    //     // Langsung kirim pekerjaan ke antrian tanpa mengubah status
+    //     RunSkdBot::dispatch($respondent);
+
+    //     $respondent->touch(); // <-- Tambah baris ini: update updated_at sebagai "trigger"
+
+    //     return back()->with('success', 'Perintah untuk menjalankan bot telah dikirim!');
+    // }
+
     public function triggerSkdBot(Respondent $respondent)
     {
-        if ($respondent->status === 'sukses') {
-            return back()->with('error', 'Data ini sudah berstatus SUKSES dan tidak bisa dientri ulang.');
+        // 1) (Opsional) Kalau mau tampilan “menunggu”, boleh set pending:
+        // $respondent->update(['status' => 'pending']);
+
+        // 2) Tulis job file per-ID ke folder automation\queue
+        $queueDir = 'C:\laragon\www\automation\queue';
+        if (!File::exists($queueDir)) {
+            File::makeDirectory($queueDir, 0755, true);
         }
+        $jobPath = $queueDir . DIRECTORY_SEPARATOR . 'job-' . $respondent->id . '.json';
+        File::put($jobPath, $respondent->toJson());  // <— isi file = JSON responden
 
-        // Langsung kirim pekerjaan ke antrian tanpa mengubah status
-        RunSkdBot::dispatch($respondent);
+        // return back()->with('success', 'Permintaan bot dikirim ke watcher (per-ID).');
+        return back()->with('success', "{$respondent->nama} akan dikirim untuk dientri");
 
-        return back()->with('success', 'Perintah untuk menjalankan bot telah dikirim!');
     }
 
     // Method untuk tombol massal
@@ -740,4 +762,14 @@ class AdminController extends Controller
         $count = $respondentsToProcess->count();
         return back()->with('success', "Berhasil! {$count} pekerjaan telah dikirim ke antrian untuk diproses oleh bot.");
     }
+
+    public function status(Respondent $respondent)
+    {
+        return response()->json([
+            'id'         => $respondent->id,
+            'status'     => $respondent->status, // <- kolommu 'status'
+            'updated_at' => optional($respondent->updated_at)->toDateTimeString(),
+        ]);
+    }
+
 }
