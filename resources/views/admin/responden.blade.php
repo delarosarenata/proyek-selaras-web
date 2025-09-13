@@ -424,16 +424,67 @@
     //     });
     // }
 
-    function copyLink(link) {
-    navigator.clipboard.writeText(link).then(() => {
-        const el = document.getElementById('copyToast');
-        if (el) {
-        const toast = new bootstrap.Toast(el);
-        toast.show();
-        }
-    });
+    // function copyLink(link) {
+    // navigator.clipboard.writeText(link).then(() => {
+    //     const el = document.getElementById('copyToast');
+    //     if (el) {
+    //     const toast = new bootstrap.Toast(el);
+    //     toast.show();
+    //     }
+    // });
+    // }
+
+    // helper: tampilkan toast kalau Swal ada; kalau nggak, fallback
+  function showToast(msg, type = 'success') {
+    if (window.Swal) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type,
+        title: msg,
+        showConfirmButton: false,
+        timer: 1800
+      });
+    } else {
+      alert(msg);
+    }
+  }
+
+  async function copyLink(url) {
+    // 1) Coba API modern (butuh HTTPS / secure context)
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        showToast('Link edit berhasil disalin!');
+        return;
+      }
+    } catch (e) {
+      // lanjut ke fallback
     }
 
+    // 2) Fallback seleksi-teks (jalan di HTTP/IP)
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+
+      if (ok) {
+        showToast('Link edit berhasil disalin!');
+        return;
+      }
+    } catch (e) {
+      // lanjut ke prompt
+    }
+
+    // 3) Fallback terakhir: prompt manual
+    prompt('Salin manual link berikut:', url);
+  }
 
     function populateModal(data) {
         let petugasDinilaiText = '<span class="text-muted">Tidak Diketahui</span>';

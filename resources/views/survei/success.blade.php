@@ -3,6 +3,12 @@
 @section('title', 'Survei Berhasil Dikirim')
 
 @section('content')
+
+<style>
+    body { background-color: var(--primary-color, #E6CFA9) !important; }
+    .card { background-color: #f8f9fa !important; }
+</style>
+
 <div class="container text-center" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
     <div class="card col-md-8 mx-auto shadow-sm">
         <div class="card-body p-5">

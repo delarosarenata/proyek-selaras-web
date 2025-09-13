@@ -22,7 +22,7 @@
 
     /* --- Variabel Warna & Style Global (EYE-FRIENDLY) --- */
     :root {
-        --primary-color: #C1856D;
+        --primary-color: #e49b7eff;
         /* Biru yang lebih lembut */
         --bg-page: #E6CFA9;
         /* Latar belakang halaman (abu-abu sangat muda, tidak putih) */
@@ -291,6 +291,49 @@
 
     .penilaian{
         background: #9A3F3F;
+    }
+
+    /* [PERBAIKAN BARU] Mengubah warna radio button, checkbox, dan highlight form */
+    .form-check-input {
+        background-color: var(--text-secondary); /* Warna abu-abu saat dipilih */
+        border-color: var(--text-secondary);
+    }
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--text-secondary);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.84); /* Shadow abu-abu */
+    }
+
+    /* [PERBAIKAN BARU] Membuat rating bintang interaktif */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse; /* Balik urutan agar hover bekerja benar */
+        justify-content: flex-end;
+    }
+    .star-rating input { display: none; }
+    .star-rating label {
+        color: #ccc;
+        cursor: pointer;
+        font-size: 2.5rem; /* Ukuran bintang */
+        transition: color 0.2s;
+    }
+    .star-rating input:checked ~ label,
+    .star-rating:not(:checked) > label:hover,
+    .star-rating:not(:checked) > label:hover ~ label {
+        color: #ffc107; /* Warna kuning saat dipilih atau di-hover */
+    }
+
+    /* [PERBAIKAN BARU] Mengubah tampilan pop-up modal Blok III */
+    #kebutuhanDataModal .modal-content {
+        background-color: #f8f9fa; /* Latar belakang abu-abu sangat muda */
+    }
+    #kebutuhanDataModal .modal-header {
+        background-color: #e9ecef; /* Header abu-abu sedikit lebih gelap */
+        border-bottom: 1px solid #dee2e6;
+    }
+    #kebutuhanDataModal .btn-primary {
+        background-color: var(--text-secondary); /* Tombol "Simpan" jadi abu-abu */
+        border-color: var(--text-secondary);
     }
 </style>
 

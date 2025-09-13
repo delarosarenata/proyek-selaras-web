@@ -113,10 +113,10 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 // routes/web.php
 
 // Rute untuk tombol PER BARIS (yang kita gunakan)
-Route::post('/run-bot/{respondent}', [AdminController::class, 'triggerSkdBot'])->name('admin.run_bot');
+// Route::post('/run-bot/{respondent}', [AdminController::class, 'triggerSkdBot'])->name('admin.run_bot');
 
 // Rute untuk tombol MASSAL (yang tidak sengaja terpakai)
-Route::post('/run-all-bots', [AdminController::class, 'triggerAllBots'])->name('admin.run_all_bots');
+// Route::post('/run-all-bots', [AdminController::class, 'triggerAllBots'])->name('admin.run_all_bots');
 
 // Auth::routes();
 
