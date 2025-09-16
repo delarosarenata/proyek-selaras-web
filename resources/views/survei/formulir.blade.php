@@ -1376,7 +1376,7 @@
                                 <option value="" selected disabled>-- Pilih Jenis Sumber --</option>
                                 <option value="Publikasi">Publikasi</option>
                                 <option value="Data Mikro">Data Mikro</option>
-                                <option value="Peta Wilkerstat">Peta Wilkerstat</option>
+                                <option value="Peta">Peta</option>
                                 <option value="Tabulasi Data">Tabulasi Data</option>
                                 <option value="Tabel di Website">Tabel di Website</option>
                             </select>
